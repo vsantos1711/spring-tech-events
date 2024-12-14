@@ -7,5 +7,5 @@ CREATE TABLE event (
   img_url VARCHAR(255) NOT NULL,
   event_url VARCHAR(255) NOT NULL,
   remote BOOLEAN NOT NULL,
-  date TIMESTAMP NOT NULL,
+  date TIMESTAMP NOT NULL
 );
