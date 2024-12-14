@@ -72,6 +72,12 @@
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<artifactId>aws-java-sdk-s3</artifactId>
+			<groupId>com.amazonaws</groupId>
+			<version>1.12.780</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
