@@ -38,6 +38,23 @@ public class EventService {
   @Value("${aws.s3.bucket}")
   private String bucketName;
 
+  public List<EventResponseDTO> searchEventsByTitle(String title, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    Page<Event> events = eventRepository.findByTitleContainingIgnoreCase(title, pageable);
+
+    return events.stream().map(event -> EventResponseDTO.builder()
+        .id(event.getId())
+        .title(event.getTitle())
+        .description(event.getDescription())
+        .date(event.getDate())
+        .city(event.getAddress() != null ? event.getAddress().getCity() : "")
+        .uf(event.getAddress() != null ? event.getAddress().getUf() : "")
+        .remote(event.getRemote())
+        .eventUrl(event.getEventUrl())
+        .imgUrl(event.getImgUrl())
+        .build()).toList();
+  }
+
   public List<EventResponseDTO> getUpcomingEvents(int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
     Page<Event> events = this.eventRepository.findUpcomingEvents(new Date(System.currentTimeMillis()), pageable);

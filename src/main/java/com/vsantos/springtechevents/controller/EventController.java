@@ -28,10 +28,19 @@ public class EventController {
     this.eventService = eventService;
   }
 
+  @GetMapping("/search")
+  public ResponseEntity<List<EventResponseDTO>> getSearchEvents(@RequestParam String title,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size) {
+
+    List<EventResponseDTO> events = eventService.searchEventsByTitle(title, page, size);
+    return ResponseEntity.ok(events);
+  }
+
   @PostMapping
-  public ResponseEntity<Event> createEvent(
-      @ModelAttribute EventRequestDTO eventDTO,
+  public ResponseEntity<Event> createEvent(@ModelAttribute EventRequestDTO eventDTO,
       @RequestParam("image") MultipartFile image) {
+
     Event createdEvent = eventService.createEvent(eventDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
   }
@@ -39,6 +48,7 @@ public class EventController {
   @GetMapping
   public ResponseEntity<List<EventResponseDTO>> getEvents(@RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size) {
+
     List<EventResponseDTO> allEvents = eventService.getUpcomingEvents(page, size);
     return ResponseEntity.status(HttpStatus.OK).body(allEvents);
   }
