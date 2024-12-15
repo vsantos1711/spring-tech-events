@@ -48,7 +48,7 @@ public class EventService {
   }
 
   private String uploadImage(MultipartFile image) {
-    String fileName = UUID.randomUUID() + "-" + image.getOriginalFilename();
+    String fileName = UUID.randomUUID().toString().substring(0, 8) + "-" + image.getOriginalFilename();
 
     try {
       File file = this.convertMultiPartToFile(image);

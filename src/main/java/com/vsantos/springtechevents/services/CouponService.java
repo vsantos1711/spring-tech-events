@@ -13,10 +13,14 @@ import com.vsantos.springtechevents.repositories.EventRepository;
 
 @Service
 public class CouponService {
+  private final CouponRepository couponRepository;
+  private final EventRepository eventRepository;
+
   @Autowired
-  private CouponRepository couponRepository;
-  @Autowired
-  private EventRepository eventRepository;
+  public CouponService(CouponRepository couponRepository, EventRepository eventRepository) {
+    this.couponRepository = couponRepository;
+    this.eventRepository = eventRepository;
+  }
 
   public Coupon createCoupon(UUID eventId, CouponRequestDTO couponDTO) {
     Event event = eventRepository.findById(eventId)

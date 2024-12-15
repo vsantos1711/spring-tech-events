@@ -17,9 +17,12 @@ import com.vsantos.springtechevents.services.EventService;
 @RestController
 @RequestMapping("/events")
 public class EventController {
+  private final EventService eventService;
 
   @Autowired
-  private EventService eventService;
+  public EventController(EventService eventService) {
+    this.eventService = eventService;
+  }
 
   @PostMapping
   public ResponseEntity<Event> createEvent(
