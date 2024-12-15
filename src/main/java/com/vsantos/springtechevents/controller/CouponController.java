@@ -19,8 +19,12 @@ import com.vsantos.springtechevents.services.CouponService;
 @RequestMapping("/coupon")
 public class CouponController {
 
+  private final CouponService couponService;
+
   @Autowired
-  private CouponService couponService;
+  public CouponController(CouponService couponService) {
+    this.couponService = couponService;
+  }
 
   @PostMapping("/event/{eventId}")
   public ResponseEntity<Coupon> createCoupon(@PathVariable UUID eventId, @RequestBody CouponRequestDTO couponDTO) {
