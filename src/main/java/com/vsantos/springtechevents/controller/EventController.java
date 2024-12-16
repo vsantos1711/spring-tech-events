@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.vsantos.springtechevents.domain.event.Event;
 import com.vsantos.springtechevents.domain.event.EventRequestDTO;
@@ -28,6 +27,18 @@ public class EventController {
     this.eventService = eventService;
   }
 
+  @GetMapping("/filter")
+  public ResponseEntity<List<EventResponseDTO>> getFilteredEvents(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(required = false) String city,
+      @RequestParam(required = false) String uf) {
+
+    List<EventResponseDTO> events = eventService.getFilteredEvents(page, size, city, uf);
+
+    return ResponseEntity.status(HttpStatus.OK).body(events);
+  }
+
   @GetMapping("/search")
   public ResponseEntity<List<EventResponseDTO>> getSearchEvents(@RequestParam String title,
       @RequestParam(defaultValue = "0") int page,
@@ -38,8 +49,7 @@ public class EventController {
   }
 
   @PostMapping
-  public ResponseEntity<Event> createEvent(@ModelAttribute EventRequestDTO eventDTO,
-      @RequestParam("image") MultipartFile image) {
+  public ResponseEntity<Event> createEvent(@ModelAttribute EventRequestDTO eventDTO) {
 
     Event createdEvent = eventService.createEvent(eventDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
