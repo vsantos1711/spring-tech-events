@@ -1,6 +1,6 @@
 package com.vsantos.springtechevents.repositories;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -17,6 +17,15 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
   public Page<Event> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
-  @Query("SELECT e FROM Event e WHERE e.date >= CURRENT_DATE")
-  public Page<Event> findUpcomingEvents(@Param("currentDate") Date currentDate, Pageable pageable);
+  @Query("SELECT e FROM Event e " +
+      "LEFT JOIN e.address a " +
+      "WHERE (:city = '' OR a.city LIKE %:city%) " +
+      "AND (:uf = '' OR a.uf LIKE %:uf%)")
+  public Page<Event> findFilteredEvents(
+      @Param("city") String city,
+      @Param("uf") String uf,
+      Pageable pageable);
+
+  @Query("SELECT e FROM Event e WHERE e.date >= :currentDate")
+  public Page<Event> findUpcomingEvents(@Param("currentDate") LocalDateTime currentDate, Pageable pageable);
 }
