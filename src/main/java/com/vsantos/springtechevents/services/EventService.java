@@ -3,7 +3,7 @@ package com.vsantos.springtechevents.services;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,6 +38,27 @@ public class EventService {
   @Value("${aws.s3.bucket}")
   private String bucketName;
 
+  public List<EventResponseDTO> getFilteredEvents(int page, int size, String city, String uf) {
+    Pageable pageable = PageRequest.of(page, size);
+
+    city = (city != null) ? city : "";
+    uf = (uf != null) ? uf : "";
+
+    Page<Event> events = eventRepository.findFilteredEvents(city, uf, pageable);
+
+    return events.stream().map(event -> EventResponseDTO.builder()
+        .id(event.getId())
+        .title(event.getTitle())
+        .description(event.getDescription())
+        .date(event.getDate())
+        .city(event.getAddress() != null ? event.getAddress().getCity() : "")
+        .uf(event.getAddress() != null ? event.getAddress().getUf() : "")
+        .remote(event.getRemote())
+        .eventUrl(event.getEventUrl())
+        .imgUrl(event.getImgUrl())
+        .build()).toList();
+  }
+
   public List<EventResponseDTO> searchEventsByTitle(String title, int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
     Page<Event> events = eventRepository.findByTitleContainingIgnoreCase(title, pageable);
@@ -57,7 +78,7 @@ public class EventService {
 
   public List<EventResponseDTO> getUpcomingEvents(int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
-    Page<Event> events = this.eventRepository.findUpcomingEvents(new Date(System.currentTimeMillis()), pageable);
+    Page<Event> events = this.eventRepository.findUpcomingEvents(LocalDateTime.now(), pageable);
 
     return events.map(event -> EventResponseDTO.builder()
         .id(event.getId())
