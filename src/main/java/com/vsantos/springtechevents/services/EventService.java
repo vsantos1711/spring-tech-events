@@ -114,7 +114,7 @@ public class EventService {
 
   public List<EventResponseDTO> getUpcomingEvents(int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
-    Page<Event> events = this.eventRepository.findUpcomingEvents(LocalDateTime.now(), pageable);
+    Page<Event> events = eventRepository.findUpcomingEvents(LocalDateTime.now(), pageable);
 
     return events.map(event -> EventResponseDTO.builder()
         .id(event.getId())
@@ -129,11 +129,11 @@ public class EventService {
         .build()).stream().toList();
   }
 
-  public Event createEvent(EventRequestDTO eventDTO) {
+  public EventResponseDTO createEvent(EventRequestDTO eventDTO) {
     String imgUrl = null;
 
     if (eventDTO.image() != null) {
-      imgUrl = this.uploadImage(eventDTO.image());
+      imgUrl = uploadImage(eventDTO.image());
     }
 
     Event newEvent = Event.builder()
@@ -145,20 +145,29 @@ public class EventService {
         .date(eventDTO.date())
         .build();
 
-    this.eventRepository.save(newEvent);
+    eventRepository.save(newEvent);
 
     if (!eventDTO.remote()) {
-      this.addressService.createAddress(eventDTO, newEvent);
+      addressService.createAddress(eventDTO, newEvent);
     }
 
-    return newEvent;
+    return EventResponseDTO.builder()
+        .title(eventDTO.title())
+        .description(eventDTO.description())
+        .imgUrl(imgUrl)
+        .eventUrl(eventDTO.eventUrl())
+        .remote(eventDTO.remote())
+        .date(eventDTO.date())
+        .city(eventDTO.city())
+        .uf(eventDTO.uf())
+        .build();
   }
 
   private String uploadImage(MultipartFile image) {
     String fileName = UUID.randomUUID().toString().substring(0, 8) + "-" + image.getOriginalFilename();
 
     try {
-      File file = this.convertMultiPartToFile(image);
+      File file = convertMultiPartToFile(image);
       s3Client.putObject(bucketName, fileName, file);
       file.delete();
       return s3Client.getUrl(bucketName, fileName).toString();
