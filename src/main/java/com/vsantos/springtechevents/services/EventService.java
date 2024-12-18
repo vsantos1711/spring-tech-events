@@ -1,8 +1,6 @@
 package com.vsantos.springtechevents.services;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.vsantos.springtechevents.domain.address.Address;
 import com.vsantos.springtechevents.domain.coupon.Coupon;
 import com.vsantos.springtechevents.domain.event.Event;
@@ -166,21 +165,16 @@ public class EventService {
   private String uploadImage(MultipartFile image) {
     String fileName = UUID.randomUUID().toString().substring(0, 8) + "-" + image.getOriginalFilename();
 
-    try {
-      File file = convertMultiPartToFile(image);
-      s3Client.putObject(bucketName, fileName, file);
-      file.delete();
+    try (InputStream inputStream = image.getInputStream()) {
+      ObjectMetadata metadata = new ObjectMetadata();
+      metadata.setContentLength(image.getSize());
+      metadata.setContentType(image.getContentType());
+
+      s3Client.putObject(bucketName, fileName, inputStream, metadata);
+
       return s3Client.getUrl(bucketName, fileName).toString();
     } catch (Exception e) {
       throw new RuntimeException("Error uploading image to S3", e);
     }
-  }
-
-  private File convertMultiPartToFile(MultipartFile file) throws IOException {
-    File convertedFile = new File(file.getOriginalFilename());
-    try (FileOutputStream fos = new FileOutputStream(convertedFile)) {
-      fos.write(file.getBytes());
-    }
-    return convertedFile;
   }
 }
