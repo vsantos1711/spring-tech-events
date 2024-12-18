@@ -7,5 +7,5 @@ import lombok.Builder;
 
 @Builder
 public record EventResponseDTO(UUID id, String title, String description, LocalDateTime date, String city, String uf,
-        Boolean remote, String eventUrl, String imgUrl) {
+                Boolean remote, String eventUrl, String imgUrl) {
 }
