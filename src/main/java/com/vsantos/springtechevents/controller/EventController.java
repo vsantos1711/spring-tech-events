@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vsantos.springtechevents.domain.event.Event;
 import com.vsantos.springtechevents.domain.event.EventDetailsDTO;
 import com.vsantos.springtechevents.domain.event.EventRequestDTO;
 import com.vsantos.springtechevents.domain.event.EventResponseDTO;
@@ -60,9 +59,9 @@ public class EventController {
   }
 
   @PostMapping
-  public ResponseEntity<Event> createEvent(@ModelAttribute EventRequestDTO eventDTO) {
+  public ResponseEntity<EventResponseDTO> createEvent(@ModelAttribute EventRequestDTO eventDTO) {
 
-    Event createdEvent = eventService.createEvent(eventDTO);
+    EventResponseDTO createdEvent = eventService.createEvent(eventDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
   }
 
