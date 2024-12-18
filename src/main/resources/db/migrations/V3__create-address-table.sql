@@ -1,4 +1,4 @@
-CREATE TABLE address (
+CREATE TABLE IF NOT EXISTS address (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   city VARCHAR(250) NOT NULL,
   UF VARCHAR(250) NOT NULL,
