@@ -1,5 +1,7 @@
 package com.vsantos.springtechevents.services;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,10 @@ public class CouponService {
     this.eventRepository = eventRepository;
   }
 
+  public List<Coupon> consultCoupons(UUID eventId, LocalDateTime currentDate) {
+    return couponRepository.findByEventIdAndValidAfter(eventId, currentDate);
+  }
+
   public Coupon createCoupon(UUID eventId, CouponRequestDTO couponDTO) {
     Event event = eventRepository.findById(eventId)
         .orElseThrow(() -> new IllegalArgumentException("Event not found"));
@@ -29,7 +35,7 @@ public class CouponService {
     Coupon coupon = Coupon.builder()
         .code(couponDTO.code())
         .discount(couponDTO.discount())
-        .expirationDate(couponDTO.expirationDate())
+        .valid(couponDTO.valid())
         .event(event)
         .build();
 
