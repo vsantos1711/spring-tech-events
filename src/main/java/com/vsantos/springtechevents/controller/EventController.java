@@ -1,18 +1,21 @@
 package com.vsantos.springtechevents.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vsantos.springtechevents.domain.event.Event;
+import com.vsantos.springtechevents.domain.event.EventDetailsDTO;
 import com.vsantos.springtechevents.domain.event.EventRequestDTO;
 import com.vsantos.springtechevents.domain.event.EventResponseDTO;
 import com.vsantos.springtechevents.services.EventService;
@@ -25,6 +28,14 @@ public class EventController {
   @Autowired
   public EventController(EventService eventService) {
     this.eventService = eventService;
+  }
+
+  @GetMapping("/{eventId}")
+  public ResponseEntity<EventDetailsDTO> getEventDetails(@PathVariable UUID eventId) {
+
+    EventDetailsDTO event = eventService.getEventById(eventId);
+
+    return ResponseEntity.status(HttpStatus.OK).body(event);
   }
 
   @GetMapping("/filter")
