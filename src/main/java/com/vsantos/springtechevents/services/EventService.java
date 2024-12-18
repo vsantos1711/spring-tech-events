@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.vsantos.springtechevents.domain.address.Address;
+import com.vsantos.springtechevents.domain.coupon.Coupon;
 import com.vsantos.springtechevents.domain.event.Event;
+import com.vsantos.springtechevents.domain.event.EventDetailsDTO;
 import com.vsantos.springtechevents.domain.event.EventRequestDTO;
 import com.vsantos.springtechevents.domain.event.EventResponseDTO;
 import com.vsantos.springtechevents.repositories.EventRepository;
@@ -27,16 +31,48 @@ public class EventService {
   private final AmazonS3 s3Client;
   private final EventRepository eventRepository;
   private final AddressService addressService;
+  private final CouponService couponService;
 
   @Autowired
-  public EventService(AmazonS3 s3Client, EventRepository eventRepository, AddressService addressService) {
+  public EventService(AmazonS3 s3Client, EventRepository eventRepository, AddressService addressService,
+      CouponService couponService) {
     this.s3Client = s3Client;
     this.eventRepository = eventRepository;
     this.addressService = addressService;
+    this.couponService = couponService;
   }
 
   @Value("${aws.s3.bucket}")
   private String bucketName;
+
+  public EventDetailsDTO getEventById(UUID eventId) {
+    Event event = eventRepository.findById(eventId)
+        .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+    Optional<Address> address = addressService.findByEventID(eventId);
+    List<Coupon> coupons = couponService.consultCoupons(eventId, LocalDateTime.now());
+
+    List<EventDetailsDTO.CouponDTO> couponDTOs = coupons.stream()
+        .map(coupon -> EventDetailsDTO.CouponDTO.builder()
+            .code(coupon.getCode())
+            .discount(coupon.getDiscount())
+            .valid(coupon.getValid())
+            .build())
+        .toList();
+
+    return EventDetailsDTO.builder()
+        .id(event.getId())
+        .title(event.getTitle())
+        .description(event.getDescription())
+        .date(event.getDate())
+        .city(address.isPresent() ? address.get().getCity() : "")
+        .state(address.isPresent() ? address.get().getUf() : "")
+        .imgUrl(event.getImgUrl())
+        .eventUrl(event.getEventUrl())
+        .remote(event.getRemote())
+        .coupons(couponDTOs)
+        .build();
+  }
 
   public List<EventResponseDTO> getFilteredEvents(int page, int size, String city, String uf) {
     Pageable pageable = PageRequest.of(page, size);
