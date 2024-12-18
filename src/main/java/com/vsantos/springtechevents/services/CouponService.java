@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.vsantos.springtechevents.domain.coupon.Coupon;
 import com.vsantos.springtechevents.domain.coupon.CouponRequestDTO;
+import com.vsantos.springtechevents.domain.coupon.CouponResponseDTO;
 import com.vsantos.springtechevents.domain.event.Event;
 import com.vsantos.springtechevents.repositories.CouponRepository;
 import com.vsantos.springtechevents.repositories.EventRepository;
@@ -28,7 +29,7 @@ public class CouponService {
     return couponRepository.findByEventIdAndValidAfter(eventId, currentDate);
   }
 
-  public Coupon createCoupon(UUID eventId, CouponRequestDTO couponDTO) {
+  public CouponResponseDTO createCoupon(UUID eventId, CouponRequestDTO couponDTO) {
     Event event = eventRepository.findById(eventId)
         .orElseThrow(() -> new IllegalArgumentException("Event not found"));
 
@@ -39,6 +40,13 @@ public class CouponService {
         .event(event)
         .build();
 
-    return couponRepository.save(coupon);
+    couponRepository.save(coupon);
+
+    return CouponResponseDTO.builder()
+        .code(coupon.getCode())
+        .discount(coupon.getDiscount())
+        .valid(coupon.getValid())
+        .eventId(eventId)
+        .build();
   }
 }
