@@ -1,6 +1,6 @@
 package com.vsantos.springtechevents.domain.coupon;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.vsantos.springtechevents.domain.event.Event;
@@ -32,7 +32,7 @@ public class Coupon {
 
   private String code;
   private Integer discount;
-  private Date expirationDate;
+  private LocalDateTime valid;
 
   @ManyToOne
   @JoinColumn(name = "event_id")
