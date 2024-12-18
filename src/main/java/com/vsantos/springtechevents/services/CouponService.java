@@ -1,6 +1,6 @@
 package com.vsantos.springtechevents.services;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +25,7 @@ public class CouponService {
     this.eventRepository = eventRepository;
   }
 
-  public List<Coupon> consultCoupons(UUID eventId, LocalDateTime currentDate) {
+  public List<Coupon> consultCoupons(UUID eventId, OffsetDateTime currentDate) {
     return couponRepository.findByEventIdAndValidAfter(eventId, currentDate);
   }
 

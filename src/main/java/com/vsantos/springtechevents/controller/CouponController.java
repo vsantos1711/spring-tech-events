@@ -15,6 +15,8 @@ import com.vsantos.springtechevents.domain.coupon.CouponRequestDTO;
 import com.vsantos.springtechevents.domain.coupon.CouponResponseDTO;
 import com.vsantos.springtechevents.services.CouponService;
 
+import io.swagger.v3.oas.annotations.Operation;
+
 @RestController
 @RequestMapping("/coupon")
 public class CouponController {
@@ -27,6 +29,7 @@ public class CouponController {
   }
 
   @PostMapping("/event/{eventId}")
+  @Operation(summary = "Create a coupon for an event")
   public ResponseEntity<CouponResponseDTO> createCoupon(@PathVariable UUID eventId,
       @RequestBody CouponRequestDTO couponDTO) {
     CouponResponseDTO coupon = couponService.createCoupon(eventId, couponDTO);

@@ -1,6 +1,6 @@
 package com.vsantos.springtechevents.domain.event;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import com.vsantos.springtechevents.domain.address.Address;
@@ -35,7 +35,7 @@ public class Event {
   private String imgUrl;
   private String eventUrl;
   private Boolean remote;
-  private LocalDateTime date;
+  private OffsetDateTime date;
 
   @OneToOne(mappedBy = "event", cascade = CascadeType.ALL)
   private Address address;

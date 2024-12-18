@@ -5,14 +5,14 @@ import java.util.UUID;
 
 import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Builder
 public record EventDetailsDTO(
     UUID id,
     String title,
     String description,
-    LocalDateTime date,
+    OffsetDateTime date,
     String city,
     String state,
     String imgUrl,
@@ -22,6 +22,6 @@ public record EventDetailsDTO(
 
   @Builder
   public record CouponDTO(
-      String code, Integer discount, LocalDateTime valid) {
+      String code, Integer discount, OffsetDateTime valid) {
   }
 }

@@ -19,6 +19,9 @@ import com.vsantos.springtechevents.domain.event.EventRequestDTO;
 import com.vsantos.springtechevents.domain.event.EventResponseDTO;
 import com.vsantos.springtechevents.services.EventService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.http.MediaType;
+
 @RestController
 @RequestMapping("/events")
 public class EventController {
@@ -30,6 +33,7 @@ public class EventController {
   }
 
   @GetMapping("/{eventId}")
+  @Operation(summary = "Get event details by id")
   public ResponseEntity<EventDetailsDTO> getEventDetails(@PathVariable UUID eventId) {
 
     EventDetailsDTO event = eventService.getEventById(eventId);
@@ -38,6 +42,7 @@ public class EventController {
   }
 
   @GetMapping("/filter")
+  @Operation(summary = "Get events by city and uf")
   public ResponseEntity<List<EventResponseDTO>> getFilteredEvents(
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size,
@@ -50,6 +55,7 @@ public class EventController {
   }
 
   @GetMapping("/search")
+  @Operation(summary = "Search events by title")
   public ResponseEntity<List<EventResponseDTO>> getSearchEvents(@RequestParam String title,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size) {
@@ -58,7 +64,8 @@ public class EventController {
     return ResponseEntity.ok(events);
   }
 
-  @PostMapping
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @Operation(summary = "Create a new event")
   public ResponseEntity<EventResponseDTO> createEvent(@ModelAttribute EventRequestDTO eventDTO) {
 
     EventResponseDTO createdEvent = eventService.createEvent(eventDTO);
@@ -66,6 +73,7 @@ public class EventController {
   }
 
   @GetMapping
+  @Operation(summary = "Get upcoming events")
   public ResponseEntity<List<EventResponseDTO>> getEvents(@RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size) {
 

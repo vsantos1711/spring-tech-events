@@ -1,6 +1,6 @@
 package com.vsantos.springtechevents.repositories;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -27,5 +27,5 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
       Pageable pageable);
 
   @Query("SELECT e FROM Event e WHERE e.date >= :currentDate")
-  public Page<Event> findUpcomingEvents(@Param("currentDate") LocalDateTime currentDate, Pageable pageable);
+  public Page<Event> findUpcomingEvents(@Param("currentDate") OffsetDateTime currentDate, Pageable pageable);
 }

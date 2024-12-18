@@ -1,7 +1,7 @@
 package com.vsantos.springtechevents.services;
 
 import java.io.InputStream;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,7 +49,7 @@ public class EventService {
         .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
 
     Optional<Address> address = addressService.findByEventID(eventId);
-    List<Coupon> coupons = couponService.consultCoupons(eventId, LocalDateTime.now());
+    List<Coupon> coupons = couponService.consultCoupons(eventId, OffsetDateTime.now());
 
     List<EventDetailsDTO.CouponDTO> couponDTOs = coupons.stream()
         .map(coupon -> EventDetailsDTO.CouponDTO.builder()
@@ -113,7 +113,7 @@ public class EventService {
 
   public List<EventResponseDTO> getUpcomingEvents(int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
-    Page<Event> events = eventRepository.findUpcomingEvents(LocalDateTime.now(), pageable);
+    Page<Event> events = eventRepository.findUpcomingEvents(OffsetDateTime.now(), pageable);
 
     return events.map(event -> EventResponseDTO.builder()
         .id(event.getId())
@@ -151,6 +151,7 @@ public class EventService {
     }
 
     return EventResponseDTO.builder()
+        .id(newEvent.getId())
         .title(eventDTO.title())
         .description(eventDTO.description())
         .imgUrl(imgUrl)
