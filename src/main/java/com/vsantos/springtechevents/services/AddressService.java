@@ -1,5 +1,8 @@
 package com.vsantos.springtechevents.services;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,10 @@ public class AddressService {
   @Autowired
   public AddressService(AddressRepository addressRepository) {
     this.addressRepository = addressRepository;
+  }
+
+  public Optional<Address> findByEventID(UUID eventId) {
+    return this.addressRepository.findByEventId(eventId);
   }
 
   public Address createAddress(EventRequestDTO data, Event event) {
