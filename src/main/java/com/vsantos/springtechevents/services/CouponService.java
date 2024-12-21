@@ -43,6 +43,7 @@ public class CouponService {
     couponRepository.save(coupon);
 
     return CouponResponseDTO.builder()
+        .id(coupon.getId())
         .code(coupon.getCode())
         .discount(coupon.getDiscount())
         .valid(coupon.getValid())
