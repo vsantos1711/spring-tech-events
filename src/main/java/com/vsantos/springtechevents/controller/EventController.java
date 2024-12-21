@@ -20,6 +20,8 @@ import com.vsantos.springtechevents.domain.event.EventResponseDTO;
 import com.vsantos.springtechevents.services.EventService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+
 import org.springframework.http.MediaType;
 
 @RestController
@@ -34,7 +36,8 @@ public class EventController {
 
   @GetMapping("/{eventId}")
   @Operation(summary = "Get event details by id")
-  public ResponseEntity<EventDetailsDTO> getEventDetails(@PathVariable UUID eventId) {
+  public ResponseEntity<EventDetailsDTO> getEventDetails(
+      @PathVariable UUID eventId) {
 
     EventDetailsDTO event = eventService.getEventById(eventId);
 
@@ -49,24 +52,27 @@ public class EventController {
       @RequestParam(required = false) String city,
       @RequestParam(required = false) String uf) {
 
-    List<EventResponseDTO> events = eventService.getFilteredEvents(page, size, city, uf);
+    List<EventResponseDTO> events = eventService.getFilteredEvents(page, size,
+        city, uf);
 
     return ResponseEntity.status(HttpStatus.OK).body(events);
   }
 
   @GetMapping("/search")
   @Operation(summary = "Search events by title")
-  public ResponseEntity<List<EventResponseDTO>> getSearchEvents(@RequestParam String title,
-      @RequestParam(defaultValue = "0") int page,
+  public ResponseEntity<List<EventResponseDTO>> getSearchEvents(
+      @RequestParam String title, @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size) {
 
-    List<EventResponseDTO> events = eventService.searchEventsByTitle(title, page, size);
+    List<EventResponseDTO> events = eventService.searchEventsByTitle(title,
+        page, size);
     return ResponseEntity.ok(events);
   }
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Operation(summary = "Create a new event")
-  public ResponseEntity<EventResponseDTO> createEvent(@ModelAttribute EventRequestDTO eventDTO) {
+  public ResponseEntity<EventResponseDTO> createEvent(
+      @ModelAttribute @Valid EventRequestDTO eventDTO) {
 
     EventResponseDTO createdEvent = eventService.createEvent(eventDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
@@ -74,10 +80,12 @@ public class EventController {
 
   @GetMapping
   @Operation(summary = "Get upcoming events")
-  public ResponseEntity<List<EventResponseDTO>> getEvents(@RequestParam(defaultValue = "0") int page,
+  public ResponseEntity<List<EventResponseDTO>> getEvents(
+      @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size) {
 
-    List<EventResponseDTO> allEvents = eventService.getUpcomingEvents(page, size);
+    List<EventResponseDTO> allEvents = eventService.getUpcomingEvents(page,
+        size);
     return ResponseEntity.status(HttpStatus.OK).body(allEvents);
   }
 }
