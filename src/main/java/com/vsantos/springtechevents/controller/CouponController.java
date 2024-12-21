@@ -16,6 +16,7 @@ import com.vsantos.springtechevents.domain.coupon.CouponResponseDTO;
 import com.vsantos.springtechevents.services.CouponService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/coupon")
@@ -30,8 +31,9 @@ public class CouponController {
 
   @PostMapping("/event/{eventId}")
   @Operation(summary = "Create a coupon for an event")
-  public ResponseEntity<CouponResponseDTO> createCoupon(@PathVariable UUID eventId,
-      @RequestBody CouponRequestDTO couponDTO) {
+  public ResponseEntity<CouponResponseDTO> createCoupon(
+      @PathVariable UUID eventId,
+      @RequestBody @Valid CouponRequestDTO couponDTO) {
     CouponResponseDTO coupon = couponService.createCoupon(eventId, couponDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(coupon);
   }
