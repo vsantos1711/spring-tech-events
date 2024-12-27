@@ -147,7 +147,8 @@ public class EventService {
     eventRepository.save(newEvent);
 
     if (!eventDTO.remote()) {
-      addressService.createAddress(eventDTO, newEvent);
+      Address address = addressService.createAddress(eventDTO, newEvent);
+      newEvent.setAddress(address);
     }
 
     return EventResponseDTO.builder()
