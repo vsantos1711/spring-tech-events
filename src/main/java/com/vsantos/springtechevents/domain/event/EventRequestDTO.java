@@ -11,7 +11,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
+
+@Builder
 public record EventRequestDTO(
 
     @NotBlank(message = "The title is required")
