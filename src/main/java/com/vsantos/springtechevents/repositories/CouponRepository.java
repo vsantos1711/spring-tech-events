@@ -11,5 +11,6 @@ import com.vsantos.springtechevents.domain.coupon.Coupon;
 
 @Repository
 public interface CouponRepository extends JpaRepository<Coupon, UUID> {
+
   List<Coupon> findByEventIdAndValidAfter(UUID eventId, OffsetDateTime currentDate);
 }

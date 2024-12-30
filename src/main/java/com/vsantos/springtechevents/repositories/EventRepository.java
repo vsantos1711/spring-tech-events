@@ -21,10 +21,7 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
       "LEFT JOIN e.address a " +
       "WHERE (:city = '' OR a.city LIKE %:city%) " +
       "AND (:uf = '' OR a.uf LIKE %:uf%)")
-  public Page<Event> findFilteredEvents(
-      @Param("city") String city,
-      @Param("uf") String uf,
-      Pageable pageable);
+  public Page<Event> findFilteredEvents(@Param("city") String city, @Param("uf") String uf, Pageable pageable);
 
   @Query("SELECT e FROM Event e WHERE e.date >= :currentDate")
   public Page<Event> findUpcomingEvents(@Param("currentDate") OffsetDateTime currentDate, Pageable pageable);
