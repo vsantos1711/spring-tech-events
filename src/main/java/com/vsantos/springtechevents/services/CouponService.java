@@ -4,7 +4,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vsantos.springtechevents.domain.coupon.Coupon;
@@ -19,7 +18,6 @@ public class CouponService {
   private final CouponRepository couponRepository;
   private final EventRepository eventRepository;
 
-  @Autowired
   public CouponService(CouponRepository couponRepository, EventRepository eventRepository) {
     this.couponRepository = couponRepository;
     this.eventRepository = eventRepository;

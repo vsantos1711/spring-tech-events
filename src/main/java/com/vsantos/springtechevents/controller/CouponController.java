@@ -2,7 +2,6 @@ package com.vsantos.springtechevents.controller;
 
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +23,6 @@ public class CouponController {
 
   private final CouponService couponService;
 
-  @Autowired
   public CouponController(CouponService couponService) {
     this.couponService = couponService;
   }

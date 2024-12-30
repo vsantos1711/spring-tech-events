@@ -3,7 +3,6 @@ package com.vsantos.springtechevents.services;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vsantos.springtechevents.domain.address.Address;
@@ -16,7 +15,6 @@ public class AddressService {
 
   private final AddressRepository addressRepository;
 
-  @Autowired
   public AddressService(AddressRepository addressRepository) {
     this.addressRepository = addressRepository;
   }

@@ -3,7 +3,6 @@ package com.vsantos.springtechevents.controller;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vsantos.springtechevents.domain.event.EventDetailsDTO;
 import com.vsantos.springtechevents.domain.event.EventRequestDTO;
 import com.vsantos.springtechevents.domain.event.EventResponseDTO;
+import com.vsantos.springtechevents.exceptions.ImageUploadException;
 import com.vsantos.springtechevents.services.EventService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +29,6 @@ import org.springframework.http.MediaType;
 public class EventController {
   private final EventService eventService;
 
-  @Autowired
   public EventController(EventService eventService) {
     this.eventService = eventService;
   }
@@ -72,7 +71,7 @@ public class EventController {
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Operation(summary = "Create a new event")
   public ResponseEntity<EventResponseDTO> createEvent(
-      @ModelAttribute @Valid EventRequestDTO eventDTO) {
+      @ModelAttribute @Valid EventRequestDTO eventDTO) throws ImageUploadException {
 
     EventResponseDTO createdEvent = eventService.createEvent(eventDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
