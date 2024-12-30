@@ -71,18 +71,18 @@ class EventRepositoryTest {
         .date(data.date())
         .build();
 
-    Address address = Address.builder()
-        .city(data.city())
-        .uf(data.uf())
-        .event(newEvent)
-        .build();
+    if (!data.remote()) {
+      Address address = Address.builder()
+          .city(data.city())
+          .uf(data.uf())
+          .event(newEvent)
+          .build();
 
-    if (newEvent.getAddress() == null) {
       newEvent.setAddress(address);
+      entityManager.persist(address);
     }
 
     entityManager.persist(newEvent);
-    entityManager.persist(address);
 
     return newEvent;
   }
