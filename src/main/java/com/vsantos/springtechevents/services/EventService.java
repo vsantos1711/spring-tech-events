@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +22,7 @@ import com.vsantos.springtechevents.domain.event.EventDetailsDTO;
 import com.vsantos.springtechevents.domain.event.EventRequestDTO;
 import com.vsantos.springtechevents.domain.event.EventResponseDTO;
 import com.vsantos.springtechevents.repositories.EventRepository;
+import com.vsantos.springtechevents.exceptions.ImageUploadException;
 
 @Service
 public class EventService {
@@ -32,7 +32,6 @@ public class EventService {
   private final AddressService addressService;
   private final CouponService couponService;
 
-  @Autowired
   public EventService(AmazonS3 s3Client, EventRepository eventRepository, AddressService addressService,
       CouponService couponService) {
     this.s3Client = s3Client;
@@ -128,7 +127,7 @@ public class EventService {
         .build()).stream().toList();
   }
 
-  public EventResponseDTO createEvent(EventRequestDTO eventDTO) {
+  public EventResponseDTO createEvent(EventRequestDTO eventDTO) throws ImageUploadException {
     String imgUrl = null;
 
     if (eventDTO.image() != null) {
@@ -164,7 +163,7 @@ public class EventService {
         .build();
   }
 
-  private String uploadImage(MultipartFile image) {
+  private String uploadImage(MultipartFile image) throws ImageUploadException {
     String fileName = UUID.randomUUID().toString().substring(0, 8) + "-" + image.getOriginalFilename();
 
     try (InputStream inputStream = image.getInputStream()) {
@@ -176,7 +175,7 @@ public class EventService {
 
       return s3Client.getUrl(bucketName, fileName).toString();
     } catch (Exception e) {
-      throw new RuntimeException("Error uploading image to S3", e);
+      throw new ImageUploadException(e);
     }
   }
 }
