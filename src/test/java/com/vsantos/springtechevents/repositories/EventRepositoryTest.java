@@ -56,8 +56,20 @@ class EventRepositoryTest {
   @Test
   @DisplayName("Should returns empty list of Events when no event is found")
   void findByTitleContainingIgnoreCaseError() {
-    // caso: falha (não achar o evento) -> retorna um array vazio
+    String title = "Java";
 
+    EventRequestDTO data = EventRequestDTO.builder()
+        .title("The best NodeJS event!")
+        .description("NodeJS event how teach you how to code in NodeJS with Express")
+        .eventUrl("https://example-node.com")
+        .date(OffsetDateTime.parse("2027-12-01T18:00:00Z"))
+        .remote(true)
+        .build();
+
+    createEvent(data);
+    Page<Event> result = eventRepository.findByTitleContainingIgnoreCase(title, null);
+
+    assertThat(result.getContent()).isEmpty();
   }
 
   private Event createEvent(EventRequestDTO data) {
