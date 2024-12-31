@@ -1,16 +1,19 @@
 
 package com.vsantos.springtechevents.services;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,12 +24,15 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.vsantos.springtechevents.domain.address.Address;
+import com.vsantos.springtechevents.domain.event.Event;
 import com.vsantos.springtechevents.domain.event.EventRequestDTO;
+import com.vsantos.springtechevents.domain.event.EventResponseDTO;
+import com.vsantos.springtechevents.exceptions.ImageUploadException;
 import com.vsantos.springtechevents.repositories.EventRepository;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -46,6 +52,40 @@ class EventServiceTest {
 
   @InjectMocks
   private EventService eventService;
+
+
+  @Test
+  @DisplayName("Should create a new event")
+  void createEvent() throws MalformedURLException, ImageUploadException {
+    EventRequestDTO eventDTO = EventRequestDTO.builder()
+        .title("The best Java event!")
+        .description("Java event that teaches you how to code in Java with Spring")
+        .eventUrl("https://example.com")
+        .remote(false)
+        .city("Recife")
+        .uf("PE")
+        .image(new MockMultipartFile("image.jpg", "image.jpg", "image/jpeg", new byte[0]))
+        .date(OffsetDateTime.now().plusDays(1))
+        .build();
+
+    when(s3Client.getUrl(any(), any())).thenReturn(URI.create("https://example.com").toURL());
+    when(addressService.createAddress(any(EventRequestDTO.class), any(Event.class)))
+        .thenReturn(new Address(UUID.randomUUID(), eventDTO.city(), eventDTO.uf(), null));
+
+    EventResponseDTO response = eventService.createEvent(eventDTO);
+
+
+    assertEquals(eventDTO.title(), response.title());
+    assertEquals(eventDTO.description(), response.description());
+    assertEquals(eventDTO.eventUrl(), response.eventUrl());
+    assertEquals(eventDTO.remote(), response.remote());
+    assertEquals(eventDTO.city(), response.address().city());
+    assertEquals(eventDTO.uf(), response.address().uf());
+    assertThat(response.imgUrl()).isNotBlank();
+    assertThat(response.date()).isAfterOrEqualTo(OffsetDateTime.now());
+
+    verify(eventRepository).save(any(Event.class));
+  }
 
   @Test
   @DisplayName("Should throw IllegalArgumentException when image is null")
@@ -68,7 +108,7 @@ class EventServiceTest {
   }
 
   @Test
-  @DisplayName("Should throw IllegalArgumentException when required fields are missing")
+  @DisplayName("Should return error messages when creating event with missing fields ")
   void createEventWithoutRequiredFields() throws MalformedURLException {
     EventRequestDTO eventDTO = EventRequestDTO.builder()
         .title(null)
