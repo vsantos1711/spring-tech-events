@@ -16,12 +16,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.vsantos.springtechevents.domain.address.Address;
+import com.vsantos.springtechevents.domain.address.AddressResponseDTO;
 import com.vsantos.springtechevents.domain.coupon.Coupon;
 import com.vsantos.springtechevents.domain.event.Event;
 import com.vsantos.springtechevents.domain.event.EventDetailsDTO;
 import com.vsantos.springtechevents.domain.event.EventRequestDTO;
 import com.vsantos.springtechevents.domain.event.EventResponseDTO;
 import com.vsantos.springtechevents.repositories.EventRepository;
+import com.vsantos.springtechevents.exceptions.EventException;
 import com.vsantos.springtechevents.exceptions.ImageUploadException;
 
 @Service
@@ -45,7 +47,7 @@ public class EventService {
 
   public EventDetailsDTO getEventById(UUID eventId) {
     Event event = eventRepository.findById(eventId)
-        .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+        .orElseThrow(() -> new EventException("Event not found with id: " + eventId));
 
     Optional<Address> address = addressService.findByEventID(eventId);
     List<Coupon> coupons = couponService.consultCoupons(eventId, OffsetDateTime.now());
@@ -85,8 +87,9 @@ public class EventService {
         .title(event.getTitle())
         .description(event.getDescription())
         .date(event.getDate())
-        .city(event.getAddress() != null ? event.getAddress().getCity() : "")
-        .uf(event.getAddress() != null ? event.getAddress().getUf() : "")
+        .address(event.getAddress() != null
+            ? new AddressResponseDTO(event.getAddress().getCity(), event.getAddress().getUf())
+            : null)
         .remote(event.getRemote())
         .eventUrl(event.getEventUrl())
         .imgUrl(event.getImgUrl())
@@ -102,8 +105,9 @@ public class EventService {
         .title(event.getTitle())
         .description(event.getDescription())
         .date(event.getDate())
-        .city(event.getAddress() != null ? event.getAddress().getCity() : "")
-        .uf(event.getAddress() != null ? event.getAddress().getUf() : "")
+        .address(event.getAddress() != null
+            ? new AddressResponseDTO(event.getAddress().getCity(), event.getAddress().getUf())
+            : null)
         .remote(event.getRemote())
         .eventUrl(event.getEventUrl())
         .imgUrl(event.getImgUrl())
@@ -119,8 +123,9 @@ public class EventService {
         .title(event.getTitle())
         .description(event.getDescription())
         .date(event.getDate())
-        .city(event.getAddress() != null ? event.getAddress().getCity() : "")
-        .uf(event.getAddress() != null ? event.getAddress().getUf() : "")
+        .address(event.getAddress() != null
+            ? new AddressResponseDTO(event.getAddress().getCity(), event.getAddress().getUf())
+            : null)
         .remote(event.getRemote())
         .eventUrl(event.getEventUrl())
         .imgUrl(event.getImgUrl())
@@ -130,9 +135,10 @@ public class EventService {
   public EventResponseDTO createEvent(EventRequestDTO eventDTO) throws ImageUploadException {
     String imgUrl = null;
 
-    if (eventDTO.image() != null) {
-      imgUrl = uploadImage(eventDTO.image());
+    if (eventDTO.image() == null) {
+      throw new IllegalArgumentException("Event image is required");
     }
+    imgUrl = uploadImage(eventDTO.image());
 
     Event newEvent = Event.builder()
         .title(eventDTO.title())
@@ -152,14 +158,15 @@ public class EventService {
 
     return EventResponseDTO.builder()
         .id(newEvent.getId())
-        .title(eventDTO.title())
-        .description(eventDTO.description())
+        .title(newEvent.getTitle())
+        .description(newEvent.getDescription())
         .imgUrl(imgUrl)
-        .eventUrl(eventDTO.eventUrl())
-        .remote(eventDTO.remote())
-        .date(eventDTO.date())
-        .city(eventDTO.city())
-        .uf(eventDTO.uf())
+        .eventUrl(newEvent.getEventUrl())
+        .remote(newEvent.getRemote())
+        .date(newEvent.getDate())
+        .address(newEvent.getAddress() != null
+            ? new AddressResponseDTO(newEvent.getAddress().getCity(), newEvent.getAddress().getUf())
+            : null)
         .build();
   }
 
