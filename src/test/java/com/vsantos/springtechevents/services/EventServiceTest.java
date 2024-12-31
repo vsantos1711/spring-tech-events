@@ -57,7 +57,8 @@ class EventServiceTest {
         .city("São Paulo")
         .uf("SP")
         .image(null)
-        .date(OffsetDateTime.parse("2022-12-01T18:00:00Z")).remote(false)
+        .date(OffsetDateTime.parse("2022-12-01T18:00:00Z"))
+        .remote(false)
         .build();
 
     IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -70,7 +71,8 @@ class EventServiceTest {
   @DisplayName("Should throw IllegalArgumentException when required fields are missing")
   void createEventWithoutRequiredFields() throws MalformedURLException {
     EventRequestDTO eventDTO = EventRequestDTO.builder()
-        .title(null).description("")
+        .title(null)
+        .description("")
         .eventUrl(null)
         .city("")
         .uf("")
@@ -81,9 +83,7 @@ class EventServiceTest {
 
     when(s3Client.getUrl(any(), any())).thenReturn(URI.create("https://example.com").toURL());
 
-    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    Validator validator = factory.getValidator();
-
+    Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
     var violations = validator.validate(eventDTO);
 
     assertFalse(violations.isEmpty());
@@ -95,8 +95,7 @@ class EventServiceTest {
         violations.stream().anyMatch(v -> v.getMessage().equals("State abbreviation must consist of two letters")));
     assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("The address is required")));
     assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("The event URL is required")));
-    assertTrue(
-        violations.stream().anyMatch(v -> v.getMessage().equals("Event date must be in the present or future")));
+    assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Event date must be in the present or future")));
   }
 
 }
