@@ -11,12 +11,18 @@ import lombok.Builder;
 @Builder
 public record EventResponseDTO(
 
-        UUID id, @Schema(example = "Spring Boot")
-        String title, @Schema(example = "A short event description")
-        String description, @Schema(example = "2024-12-18T22:26:24.649Z")
-        OffsetDateTime date, @Schema(example = "true")
-        Boolean remote, @Schema(example = "https://javac.com.br")
-        String eventUrl, @Schema(example = "https://th.bing.com/th/id/OIP.2vUTawLy")
+        UUID id, 
+        @Schema(example = "Spring Boot")
+        String title, 
+        @Schema(example = "A short event description")
+        String description, 
+        @Schema(example = "2024-12-18T22:26:24.649Z")
+        OffsetDateTime date,
+        @Schema(example = "true")
+        Boolean remote, 
+        @Schema(example = "https://javac.com.br")
+        String eventUrl, 
+        @Schema(example = "https://th.bing.com/th/id/OIP.2vUTawLy") 
         String imgUrl, @Schema()
         AddressResponseDTO address) {
 
