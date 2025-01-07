@@ -10,14 +10,13 @@ import com.vsantos.springtechevents.domain.event.Event;
 import com.vsantos.springtechevents.domain.event.EventRequestDTO;
 import com.vsantos.springtechevents.repositories.AddressRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AddressService {
 
   private final AddressRepository addressRepository;
-
-  public AddressService(AddressRepository addressRepository) {
-    this.addressRepository = addressRepository;
-  }
 
   public Optional<Address> findByEventID(UUID eventId) {
     return this.addressRepository.findByEventId(eventId);

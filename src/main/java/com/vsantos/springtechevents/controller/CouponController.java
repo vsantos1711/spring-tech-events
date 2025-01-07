@@ -16,16 +16,14 @@ import com.vsantos.springtechevents.services.CouponService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/coupon")
+@RequiredArgsConstructor
 public class CouponController {
 
   private final CouponService couponService;
-
-  public CouponController(CouponService couponService) {
-    this.couponService = couponService;
-  }
 
   @PostMapping("/event/{eventId}")
   @Operation(summary = "Create a coupon for an event")

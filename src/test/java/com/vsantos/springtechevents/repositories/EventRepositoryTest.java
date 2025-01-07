@@ -4,7 +4,6 @@ import java.time.OffsetDateTime;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
@@ -15,19 +14,15 @@ import com.vsantos.springtechevents.domain.event.EventRequestDTO;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@RequiredArgsConstructor
 class EventRepositoryTest {
 
-  @Autowired
-  EventRepository eventRepository;
-
-  @Autowired
-  AddressRepository addressRepository;
-
-  @Autowired
-  EntityManager entityManager;
+  private final EventRepository eventRepository;
+  private final EntityManager entityManager;
 
   @Test
   @DisplayName("Should returns list of Events when successful")

@@ -21,17 +21,16 @@ import com.vsantos.springtechevents.services.EventService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/events")
+@RequiredArgsConstructor
 public class EventController {
-  private final EventService eventService;
 
-  public EventController(EventService eventService) {
-    this.eventService = eventService;
-  }
+  private final EventService eventService;
 
   @GetMapping("/{eventId}")
   @Operation(summary = "Get event details by id")

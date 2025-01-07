@@ -13,15 +13,14 @@ import com.vsantos.springtechevents.domain.event.Event;
 import com.vsantos.springtechevents.repositories.CouponRepository;
 import com.vsantos.springtechevents.repositories.EventRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CouponService {
+
   private final CouponRepository couponRepository;
   private final EventRepository eventRepository;
-
-  public CouponService(CouponRepository couponRepository, EventRepository eventRepository) {
-    this.couponRepository = couponRepository;
-    this.eventRepository = eventRepository;
-  }
 
   public List<Coupon> consultCoupons(UUID eventId, OffsetDateTime currentDate) {
     return couponRepository.findByEventIdAndValidAfter(eventId, currentDate);

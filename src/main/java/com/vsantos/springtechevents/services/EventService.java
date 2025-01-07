@@ -23,24 +23,20 @@ import com.vsantos.springtechevents.domain.event.EventDetailsDTO;
 import com.vsantos.springtechevents.domain.event.EventRequestDTO;
 import com.vsantos.springtechevents.domain.event.EventResponseDTO;
 import com.vsantos.springtechevents.repositories.EventRepository;
+
+import lombok.RequiredArgsConstructor;
+
 import com.vsantos.springtechevents.exceptions.EventException;
 import com.vsantos.springtechevents.exceptions.ImageUploadException;
 
 @Service
+@RequiredArgsConstructor
 public class EventService {
 
   private final AmazonS3 s3Client;
   private final EventRepository eventRepository;
   private final AddressService addressService;
   private final CouponService couponService;
-
-  public EventService(AmazonS3 s3Client, EventRepository eventRepository, AddressService addressService,
-      CouponService couponService) {
-    this.s3Client = s3Client;
-    this.eventRepository = eventRepository;
-    this.addressService = addressService;
-    this.couponService = couponService;
-  }
 
   @Value("${aws.s3.bucket}")
   private String bucketName;
