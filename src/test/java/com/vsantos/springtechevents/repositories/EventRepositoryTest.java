@@ -5,8 +5,10 @@ import java.time.OffsetDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestConstructor;
 
 import com.vsantos.springtechevents.domain.address.Address;
 import com.vsantos.springtechevents.domain.event.Event;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @RequiredArgsConstructor
 class EventRepositoryTest {
 
