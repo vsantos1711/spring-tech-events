@@ -3,9 +3,7 @@ package com.vsantos.springtechevents.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -138,5 +139,31 @@ class EventServiceTest {
             "The address is required",
             "The event URL is required",
             "Event date must be in the present or future");
+  }
+
+  @Test
+  @DisplayName("Should return a list of upcoming events")
+  void getUpcomingEvents() {
+    OffsetDateTime now = OffsetDateTime.now();
+
+    Event futureEvent = Event.builder()
+        .title("Future Event")
+        .description("An upcoming event")
+        .eventUrl("https://example-future.com")
+        .date(now.plusDays(5))
+        .remote(true)
+        .build();
+
+    when(eventRepository.findUpcomingEvents(any(OffsetDateTime.class), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(List.of(futureEvent)));
+
+    List<EventResponseDTO> result = eventService.getUpcomingEvents(0, 10);
+
+    assertThat(result)
+        .isNotEmpty()
+        .allSatisfy(event -> {
+          assertThat(event.date()).isAfterOrEqualTo(now);
+          assertThat(event).isInstanceOf(EventResponseDTO.class);
+        });
   }
 }
