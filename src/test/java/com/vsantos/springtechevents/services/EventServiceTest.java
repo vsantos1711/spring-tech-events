@@ -126,16 +126,17 @@ class EventServiceTest {
     Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
     var violations = validator.validate(eventDTO);
 
-    assertFalse(violations.isEmpty());
-    assertEquals(7, violations.size());
-    assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("The title is required")));
-    assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("The description is required")));
-    assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("The remote flag is required")));
-    assertTrue(
-        violations.stream().anyMatch(v -> v.getMessage().equals("State abbreviation must consist of two letters")));
-    assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("The address is required")));
-    assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("The event URL is required")));
-    assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Event date must be in the present or future")));
+    assertThat(violations)
+        .isNotEmpty()
+        .hasSize(7)
+        .extracting("message")
+        .containsExactlyInAnyOrder(
+            "The title is required",
+            "The description is required",
+            "The remote flag is required",
+            "State abbreviation must consist of two letters",
+            "The address is required",
+            "The event URL is required",
+            "Event date must be in the present or future");
   }
-
 }
