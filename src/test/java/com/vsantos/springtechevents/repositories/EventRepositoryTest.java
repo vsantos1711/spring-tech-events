@@ -5,7 +5,6 @@ import java.time.OffsetDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestConstructor;
@@ -67,6 +66,77 @@ class EventRepositoryTest {
     createEvent(data);
     Page<Event> result = eventRepository.findByTitleContainingIgnoreCase(title, null);
 
+    assertThat(result.getContent()).isEmpty();
+  }
+
+  @Test
+  @DisplayName("Should returns list of Events when successful")
+  void findFilteredEventsSuccess() {
+    String city = "São Paulo";
+    String uf = "SP";
+
+    EventRequestDTO eventTwo = EventRequestDTO.builder()
+        .title("The best Node course!")
+        .description("Node course how teach you how to code in Node with Express")
+        .eventUrl("https://example-node.com")
+        .city("Recife")
+        .uf("PE")
+        .date(OffsetDateTime.parse("2025-12-12T18:00:00Z"))
+        .remote(false)
+        .build();
+
+    EventRequestDTO eventOne = EventRequestDTO.builder()
+        .title("The best Java event!")
+        .description("Java event how teach you how to code in Java with Spring")
+        .eventUrl("https://example.com")
+        .city("São Paulo")
+        .uf("SP")
+        .date(OffsetDateTime.parse("2025-12-01T18:00:00Z"))
+        .remote(false)
+        .build();
+
+    createEvent(eventOne);
+    createEvent(eventTwo);
+
+    Page<Event> result = eventRepository.findFilteredEvents(city, uf, null);
+    assertThat(result.getContent()).isNotEmpty();
+    assertThat(result.getContent()).hasSize(1);
+
+    Event event = result.getContent().get(0);
+    assertThat(event.getAddress().getCity()).contains(city);
+    assertThat(event.getAddress().getUf()).contains(uf);
+  }
+
+  @Test
+  @DisplayName("Should returns empty list of Events when no event is found")
+  void findFilteredEventsError() {
+    String city = "São Paulo";
+    String uf = "SP";
+
+    EventRequestDTO eventTwo = EventRequestDTO.builder()
+        .title("The best Node course!")
+        .description("Node course how teach you how to code in Node with Express")
+        .eventUrl("https://example-node.com")
+        .city("Recife")
+        .uf("PE")
+        .date(OffsetDateTime.parse("2025-12-12T18:00:00Z"))
+        .remote(false)
+        .build();
+
+    EventRequestDTO eventOne = EventRequestDTO.builder()
+        .title("The best Java event!")
+        .description("Java event how teach you how to code in Java with Spring")
+        .eventUrl("https://example.com")
+        .city("Recife")
+        .uf("PE")
+        .date(OffsetDateTime.parse("2025-12-01T18:00:00Z"))
+        .remote(false)
+        .build();
+
+    createEvent(eventOne);
+    createEvent(eventTwo);
+
+    Page<Event> result = eventRepository.findFilteredEvents(city, uf, null);
     assertThat(result.getContent()).isEmpty();
   }
 
