@@ -53,7 +53,6 @@ class EventServiceTest {
   @InjectMocks
   private EventService eventService;
 
-
   @Test
   @DisplayName("Should create a new event")
   void createEvent() throws MalformedURLException, ImageUploadException {
@@ -74,15 +73,16 @@ class EventServiceTest {
 
     EventResponseDTO response = eventService.createEvent(eventDTO);
 
-
-    assertEquals(eventDTO.title(), response.title());
-    assertEquals(eventDTO.description(), response.description());
-    assertEquals(eventDTO.eventUrl(), response.eventUrl());
-    assertEquals(eventDTO.remote(), response.remote());
-    assertEquals(eventDTO.city(), response.address().city());
-    assertEquals(eventDTO.uf(), response.address().uf());
-    assertThat(response.imgUrl()).isNotBlank();
-    assertThat(response.date()).isAfterOrEqualTo(OffsetDateTime.now());
+    assertThat(response).isNotNull().satisfies(event -> {
+      assertEquals(event.title(), eventDTO.title());
+      assertEquals(event.description(), eventDTO.description());
+      assertEquals(event.eventUrl(), eventDTO.eventUrl());
+      assertEquals(event.remote(), eventDTO.remote());
+      assertEquals(event.address().city(), eventDTO.city());
+      assertEquals(event.address().uf(), eventDTO.uf());
+      assertThat(event.imgUrl()).isNotBlank();
+      assertThat(event.date()).isAfterOrEqualTo(OffsetDateTime.now());
+    });
 
     verify(eventRepository).save(any(Event.class));
   }

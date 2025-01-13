@@ -55,11 +55,13 @@ class EventRepositoryTest {
 
     Page<Event> result = eventRepository.findByTitleContainingIgnoreCase(title, null);
 
-    assertThat(result.getContent()).isNotEmpty();
-    assertThat(result.getContent()).hasSize(1);
-
-    Event event = result.getContent().get(0);
-    assertThat(event.getTitle()).contains(title);
+    assertThat(result)
+        .isNotEmpty()
+        .hasSize(1)
+        .first()
+        .satisfies(event -> {
+          assertThat(event.getTitle()).contains(title);
+        });
   }
 
   @Test
@@ -67,16 +69,6 @@ class EventRepositoryTest {
   void findFilteredEvents() {
     String city = "São Paulo";
     String uf = "SP";
-
-    EventRequestDTO eventTwo = EventRequestDTO.builder()
-        .title("The best Node course!")
-        .description("Node course how teach you how to code in Node with Express")
-        .eventUrl("https://example-node.com")
-        .city("Recife")
-        .uf("PE")
-        .date(OffsetDateTime.now().plusDays(2))
-        .remote(false)
-        .build();
 
     EventRequestDTO eventOne = EventRequestDTO.builder()
         .title("The best Java event!")
@@ -88,21 +80,6 @@ class EventRepositoryTest {
         .remote(false)
         .build();
 
-    createEvent(eventOne);
-    createEvent(eventTwo);
-
-    Page<Event> result = eventRepository.findFilteredEvents(city, uf, null);
-    assertThat(result.getContent()).isNotEmpty();
-    assertThat(result.getContent()).hasSize(1);
-
-    Event event = result.getContent().get(0);
-    assertThat(event.getAddress().getCity()).contains(city);
-    assertThat(event.getAddress().getUf()).contains(uf);
-  }
-
-  @Test
-  @DisplayName("Should returns list of upcoming Events")
-  void findUpcomingEventsSuccess() {
     EventRequestDTO eventTwo = EventRequestDTO.builder()
         .title("The best Node course!")
         .description("Node course how teach you how to code in Node with Express")
@@ -113,7 +90,35 @@ class EventRepositoryTest {
         .remote(false)
         .build();
 
-    EventRequestDTO eventOne = EventRequestDTO.builder()
+    createEvent(eventOne);
+    createEvent(eventTwo);
+
+    Page<Event> result = eventRepository.findFilteredEvents(city, uf, null);
+
+    assertThat(result)
+        .isNotEmpty()
+        .hasSize(1)
+        .first()
+        .satisfies(event -> {
+          assertThat(event.getAddress().getCity()).contains(city);
+          assertThat(event.getAddress().getUf()).contains(uf);
+        });
+  }
+
+  @Test
+  @DisplayName("Should returns list of upcoming Events")
+  void findUpcomingEventsSuccess() {
+    EventRequestDTO upcomingEvent = EventRequestDTO.builder()
+        .title("The best Node course!")
+        .description("Node course how teach you how to code in Node with Express")
+        .eventUrl("https://example-node.com")
+        .city("Recife")
+        .uf("PE")
+        .date(OffsetDateTime.now().plusDays(2))
+        .remote(false)
+        .build();
+
+    EventRequestDTO pastEvent = EventRequestDTO.builder()
         .title("The best Java event!")
         .description("Java event how teach you how to code in Java with Spring")
         .eventUrl("https://example.com")
@@ -123,12 +128,18 @@ class EventRepositoryTest {
         .remote(false)
         .build();
 
-    createEvent(eventOne);
-    createEvent(eventTwo);
+    createEvent(upcomingEvent);
+    createEvent(pastEvent);
 
     Page<Event> result = eventRepository.findUpcomingEvents(OffsetDateTime.now(), null);
-    assertThat(result.getContent()).isNotEmpty();
-    assertThat(result.getContent()).hasSize(1);
+
+    assertThat(result)
+        .isNotEmpty()
+        .hasSize(1)
+        .first()
+        .satisfies(event -> {
+          assertThat(event.getDate()).isAfterOrEqualTo(OffsetDateTime.now());
+        });
   }
 
   private Event createEvent(EventRequestDTO data) {

@@ -2,8 +2,8 @@ package com.vsantos.springtechevents.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestConstructor;
 
 import com.vsantos.springtechevents.domain.address.Address;
+import com.vsantos.springtechevents.domain.coupon.Coupon;
 import com.vsantos.springtechevents.domain.event.Event;
 import com.vsantos.springtechevents.domain.event.EventRequestDTO;
 
@@ -22,49 +23,56 @@ import lombok.RequiredArgsConstructor;
 @ActiveProfiles("test")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @RequiredArgsConstructor
-class AddressRepositoryTest {
+class CouponRepositoryTest {
 
-  private final AddressRepository addressRepository;
+  private final CouponRepository couponRepository;
   private final EntityManager entityManager;
 
   @Test
-  @DisplayName("Should find address by event id")
-  void findByEventIdSuccess() {
+  @DisplayName("Should find valid coupon by Event id")
+  void findByEventIdAndValidAfter() {
     EventRequestDTO eventDTO = EventRequestDTO.builder()
         .title("The best Java event!")
         .description("Java event how teach you how to code in Java with Spring")
         .eventUrl("https://example.com")
         .city("São Paulo")
         .uf("SP")
-        .date(null)
+        .date(OffsetDateTime.now().plusDays(2))
         .remote(false)
         .build();
 
     Event event = createEvent(eventDTO);
 
-    Optional<Address> result = addressRepository.findByEventId(event.getId());
+    Coupon invalidCoupon = Coupon.builder()
+        .code("TECHOLD")
+        .discount(10)
+        .event(event)
+        .valid(OffsetDateTime.now().minusDays(1))
+        .build();
+
+    Coupon validCoupon = Coupon.builder()
+        .code("TECHNOW")
+        .discount(10)
+        .event(event)
+        .valid(OffsetDateTime.now().plusDays(1))
+        .build();
+
+    entityManager.persist(invalidCoupon);
+    entityManager.persist(validCoupon);
+
+    List<Coupon> result = couponRepository.findByEventIdAndValidAfter(event.getId(), OffsetDateTime.now());
 
     assertThat(result)
-        .isPresent()
-        .get()
-        .satisfies(address -> {
-          assertThat(address.getCity()).isEqualTo(eventDTO.city());
-          assertThat(address.getUf()).isEqualTo(eventDTO.uf());
+        .isNotEmpty()
+        .hasSize(1)
+        .first()
+        .satisfies(coupon -> {
+          assertThat(coupon.getEvent()).isEqualTo(event);
+          assertThat(coupon.getCode()).isEqualTo(validCoupon.getCode());
         });
   }
 
-  @Test
-  @DisplayName("Should return empty when address not found by event id")
-  void findByEventIdError() {
-    UUID eventId = UUID.randomUUID();
-
-    Optional<Address> foundAddress = addressRepository.findByEventId(eventId);
-
-    assertThat(foundAddress).isNotPresent();
-  }
-
   private Event createEvent(EventRequestDTO data) {
-
     Event newEvent = Event.builder()
         .title(data.title())
         .description(data.description())
